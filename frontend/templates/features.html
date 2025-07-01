@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudTest - Features</title>
+    <!-- Add FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add AOS (Animate on Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Include Firebase scripts -->
+    {% include 'firebase_scripts.html' %}
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #2563eb);
+            --gradient-secondary: linear-gradient(135deg, #10b981, #059669);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Performance optimizations */
+        .feature-card, .tech-logo, .content-card, .section-header {
+            will-change: transform, opacity;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            [data-aos] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
+        
+        /* Force hardware acceleration for smoother animations */
+        [data-aos] {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #162449, var(--bg-dark));
+            color: var(--text-light);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 25%);
+            z-index: -1;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand-icon {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand:hover .nav-brand-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .nav-brand-text::after {
+            display: none;
+        }
+
+        .nav-brand:hover .nav-brand-text::after {
+            width: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-light);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            background-image: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.6)), url('https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: pulse-bg 15s infinite alternate;
+            z-index: 0;
+        }
+        
+        @keyframes pulse-bg {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .page-header > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Content Card */
+        .content-card {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+            z-index: 1;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-card {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+            z-index: -1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Technology Section */
+        .technology-section {
+            margin-top: 3rem;
+        }
+
+        .tech-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .tech-logo {
+            background-color: rgba(15, 23, 42, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.25rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            width: 150px;
+            height: 150px;
+        }
+
+        .tech-logo:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .tech-logo i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .tech-name {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        /* Try Demo Section */
+        .try-demo {
+            text-align: center;
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .try-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+            z-index: -1;
+        }
+
+        .try-demo h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .try-demo p {
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        footer p {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Auth and User styles */
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .auth-button {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .auth-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .login-button {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .signup-button {
+            background-color: var(--primary-color);
+        }
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown-toggle:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 240px;
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown.active .user-dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.25rem;
+            transition: all 0.3s;
+        }
+        
+        .user-email {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+        
+        .user-dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        .auth-action {
+            display: block;
+        }
+
+        .user-action {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav id="mainNav">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-brand">
+                <i class="fa-solid fa-shield-halved nav-brand-icon"></i>
+                <span class="nav-brand-text">FraudTest</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('features') }}" class="nav-link active">Features</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                
+                <!-- Auth buttons: shown when user is not logged in -->
+                <div class="auth-buttons auth-action">
+                    <a href="{{ url_for('login') }}" class="auth-button login-button">
+                        <i data-feather="log-in" class="h-4 w-4"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{{ url_for('register') }}" class="auth-button signup-button">
+                        <i data-feather="user-plus" class="h-4 w-4"></i>
+                        <span>Sign Up</span>
+                    </a>
+                </div>
+                
+                <!-- User dropdown: shown when user is logged in -->
+                <div class="user-dropdown user-action">
+                    <div class="user-dropdown-toggle">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span class="user-display-name">User</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="user-dropdown-menu">
+                        <div class="user-dropdown-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span class="user-email"></span>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="{{ url_for('dashboard') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('history') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-history"></i>
+                            <span>Analysis History</span>
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-user-edit"></i>
+                            <span>Profile</span>
+                        </a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item logout-button">
+                            <i class="fa-solid fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header" data-aos="fade-up">
+            <h1>Advanced URL Fraud Detection</h1>
+            <p>Discover how our platform protects you from online threats with cutting-edge technologies and comprehensive analysis features.</p>
+        </div>
+
+        <div class="content-card" data-aos="fade-up" data-aos-delay="100">
+            <h2>Comprehensive Protection</h2>
+            <p>FraudTest provides a multi-layered approach to URL analysis, combining machine learning with traditional pattern matching and heuristic analysis to offer comprehensive protection against online threats.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+                    <h3 class="feature-title">Deep URL Analysis</h3>
+                    <p class="feature-description">Our system analyzes over 50 different features of each URL, including domain characteristics, path structure, query parameters, and special characters to identify potential threats.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Machine Learning Detection</h3>
+                    <p class="feature-description">We employ advanced machine learning models trained on millions of URLs to recognize patterns associated with phishing, malware, and other online threats.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="250">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                    <h3 class="feature-title">Pattern Recognition</h3>
+                    <p class="feature-description">Our system detects suspicious patterns commonly used in phishing attempts, such as brand impersonation, redirect chains, and deceptive domains.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <h3 class="feature-title">Domain Intelligence</h3>
+                    <p class="feature-description">We provide comprehensive information about domains, including registration details, hosting location, age, and reputation scores from various security providers.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="350">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h3 class="feature-title">Geographical Analysis</h3>
+                    <p class="feature-description">Identify the geographical location of the server hosting the URL and detect mismatches between claimed and actual locations—a common indicator of fraud.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">SSL Certificate Validation</h3>
+                    <p class="feature-description">Verify the authenticity of SSL certificates and identify potential security issues with HTTPS implementations that might indicate a fraudulent website.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card" data-aos="fade-up" data-aos-delay="450">
+            <h2>Detailed Risk Reporting</h2>
+            <p>Our platform doesn't just tell you if a URL is risky—it explains why. We provide comprehensive reports with detailed insights into each aspect of our analysis.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3 class="feature-title">Risk Breakdown</h3>
+                    <p class="feature-description">See exactly how each factor contributes to the overall risk score, with clear explanations of why certain elements triggered our detection systems.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="550">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h3 class="feature-title">Feature Details</h3>
+                    <p class="feature-description">Examine a comprehensive list of URL features we analyze, with explanations of how each feature impacts the risk assessment.</p>
+                </div>
+                
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="feature-title">Suspicious Pattern Alerts</h3>
+                    <p class="feature-description">Receive clear alerts about specific suspicious patterns detected in the URL, with explanations of why they might indicate fraudulent intent.</p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="550">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+                    <h3 class="feature-title">Comprehensive Risk Scoring</h3>
+                    <p class="feature-description">
+                        Our system provides detailed risk scoring across multiple security dimensions, with clear explanations of which elements contribute to the overall risk assessment.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card technology-section" data-aos="fade-up" data-aos-delay="650">
+            <h2>Powered by Advanced Technology</h2>
+            <p>Our platform leverages cutting-edge technologies to deliver fast, accurate, and comprehensive fraud detection.</p>
+            
+            <div class="tech-logos">
+                <div class="tech-logo" data-aos="zoom-in" data-aos-delay="700">
+                    <i class="fab fa-python"></i>
+                    <span class="tech-name">Python</span>
+                </div>
+                
+                <div class="tech-logo" data-aos="zoom-in" data-aos-delay="750">
+                    <i class="fab fa-tensorflow"></i>
+                    <span class="tech-name">TensorFlow</span>
+                </div>
+                
+                <div class="tech-logo" data-aos="zoom-in" data-aos-delay="800">
+                    <i class="fas fa-database"></i>
+                    <span class="tech-name">Big Data</span>
+                </div>
+                
+                <div class="tech-logo" data-aos="zoom-in" data-aos-delay="850">
+                    <i class="fas fa-cloud"></i>
+                    <span class="tech-name">Cloud</span>
+                </div>
+                
+                <div class="tech-logo" data-aos="zoom-in" data-aos-delay="900">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="tech-name">Security</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="try-demo" data-aos="fade-up" data-aos-delay="950">
+            <h2>Try Our Advanced URL Fraud Detection</h2>
+            <p>Experience the power of our fraud detection platform firsthand. Simply enter a URL and get a comprehensive risk assessment in seconds.</p>
+            <a href="/" class="btn-primary">Try it Now</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 FraudTest - Advanced Fraud Detection Platform | Final Year Project</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS (Animate on Scroll) with optimized settings
+            AOS.init({
+                duration: 600,          // Reduced from 800
+                easing: 'ease-out',     // Changed from ease-in-out to ease-out (faster)
+                once: true,             // Elements will only animate once
+                mirror: false,          // No animations when scrolling back up
+                disable: 'mobile',      // Disable on mobile for better performance
+                throttleDelay: 99,      // Increase throttle delay to reduce calculations
+                offset: 120,            // Only trigger animations when element is 120px into viewport
+                delay: 0,               // Remove delays from initialization (individual delays still apply)
+                disableMutationObserver: false
+            });
+            
+            // Handle navbar scroll effect
+            const navbar = document.querySelector('nav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Handle user dropdown 
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (userDropdown) {
+                const toggle = userDropdown.querySelector('.user-dropdown-toggle');
+                toggle.addEventListener('click', function() {
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Reduce animation delays for smoother scrolling
+            document.querySelectorAll('[data-aos-delay]').forEach(element => {
+                // Get current delay and reduce it
+                const currentDelay = parseInt(element.getAttribute('data-aos-delay'));
+                if (currentDelay > 100) {
+                    element.setAttribute('data-aos-delay', Math.min(currentDelay, 100));
+                }
+            });
+            
+            // Check if user is logged in
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    const authAction = document.querySelector('.auth-action');
+                    const userAction = document.querySelector('.user-action');
+                    
+                    if (user) {
+                        // User is signed in
+                        if (authAction) authAction.style.display = 'none';
+                        if (userAction) userAction.style.display = 'block';
+                        
+                        // Update user info in dropdown
+                        const userDisplayName = document.querySelector('.user-display-name');
+                        const userEmail = document.querySelector('.user-email');
+                        
+                        if (userDisplayName) {
+                            userDisplayName.textContent = user.displayName || 'User';
+                        }
+                        
+                        if (userEmail) {
+                            userEmail.textContent = user.email;
+                        }
+                        
+                        // Handle logout
+                        const logoutButton = document.querySelector('.logout-button');
+                        if (logoutButton) {
+                            logoutButton.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                firebase.auth().signOut().then(function() {
+                                    window.location.href = "/";
+                                }).catch(function(error) {
+                                    console.error("Error signing out:", error);
+                                });
+                            });
+                        }
+                    } else {
+                        // No user is signed in
+                        if (authAction) authAction.style.display = 'block';
+                        if (userAction) userAction.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

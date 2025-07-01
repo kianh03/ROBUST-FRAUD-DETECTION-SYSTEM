@@ -1,0 +1,278 @@
+/* Risk Display Styles */
+
+/* Risk Score Display */
+.risk-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(30, 41, 59, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  position: relative;
+  min-width: 200px;
+}
+
+.score-display::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.score-display.risk-low::before {
+  background: var(--success-color);
+}
+
+.score-display.risk-medium::before {
+  background: var(--warning-color);
+}
+
+.score-display.risk-high::before {
+  background: var(--danger-color);
+}
+
+.score-display.risk-low {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.score-display.risk-medium {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.score-display.risk-high {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.risk-score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.risk-score.risk-low {
+  color: var(--success-color);
+}
+
+.risk-score.risk-medium {
+  color: var(--warning-color);
+}
+
+.risk-score.risk-high {
+  color: var(--danger-color);
+}
+
+.risk-label {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Progress bar for overall score */
+.score-progress-container {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.score-progress {
+  width: 100%;
+  height: 12px;
+  background-color: rgba(30, 41, 59, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.score-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warning-color), #f97316);
+  border-radius: 6px;
+  transition: width 0.5s ease-in-out;
+}
+
+.score-progress-label {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Key Risk Factors */
+.risk-factors-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.risk-factor {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background-color: rgba(30, 41, 59, 0.5);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.factor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.factor-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.factor-value {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.factor-bar-container {
+  height: 8px;
+  background-color: rgba(30, 41, 59, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.factor-bar {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.factor-bar.success {
+  background-color: var(--success-color);
+}
+
+.factor-bar.warning {
+  background-color: var(--warning-color);
+}
+
+.factor-bar.danger {
+  background-color: var(--danger-color);
+}
+
+.factor-percentage {
+  text-align: right;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.factor-percentage.success {
+  color: var(--success-color);
+}
+
+.factor-percentage.warning {
+  color: var(--warning-color);
+}
+
+.factor-percentage.danger {
+  color: var(--danger-color);
+}
+
+/* Domain Info */
+.domain-info-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.domain-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(30, 41, 59, 0.5);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.domain-info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+}
+
+.domain-info-content {
+  flex: 1;
+}
+
+.domain-info-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.domain-info-value {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Feature Details */
+.feature-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.feature-details-table th,
+.feature-details-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.feature-details-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.impact-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.impact-value {
+  min-width: 3rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.impact-bar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.impact-bar.success {
+  background-color: var(--success-color);
+}
+
+.impact-bar.warning {
+  background-color: var(--warning-color);
+}
+
+.impact-bar.danger {
+  background-color: var(--danger-color);
+} 

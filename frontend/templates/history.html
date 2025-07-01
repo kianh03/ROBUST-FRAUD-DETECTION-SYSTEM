@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudTest - Analysis History</title>
+    <!-- Add FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add AOS (Animate on Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add Feather Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    
+    <!-- Include Firebase scripts -->
+    {% include 'firebase_scripts.html' %}
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #2563eb);
+            --gradient-secondary: linear-gradient(135deg, #10b981, #059669);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #162449, var(--bg-dark));
+            color: var(--text-light);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 25%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .nav-brand-icon {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-light);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* User dropdown styles - Updated to match other pages */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .user-dropdown-toggle:hover {
+            background-color: var(--bg-light);
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 240px;
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .user-dropdown.active .user-dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .user-dropdown-email {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: rgba(51, 65, 85, 0.5);
+        }
+
+        .user-email {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .logout-button {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            border-top: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .logout-button i {
+            color: var(--danger-color);
+        }
+
+        /* Make auth elements initially hidden and show based on auth state */
+        .auth-action {
+            display: block;
+        }
+
+        .user-action {
+            display: none;
+        }
+
+        /* Page Header */
+        .page-header {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            background-image: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.6)), url('https://images.unsplash.com/photo-1560807707-8cc77767d783?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* History Table */
+        .history-table-container {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            vertical-align: middle;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .risk-score-display {
+            background-color: rgba(15, 23, 42, 0.6);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            min-width: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--success-color);
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .risk-score-display.risk-high {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .risk-score-display.risk-medium {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .risk-score-display.risk-low {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .risk-badge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.35rem 0.85rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 80px;
+            margin: 0 auto;
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .risk-high {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            text-decoration: none;
+            margin-right: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-spinner {
+            display: none;
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .empty-state a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        footer p {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .history-table-container {
+                padding: 1rem;
+            }
+
+            .history-table {
+                font-size: 0.875rem;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .action-btn {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="mainNav">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-brand">
+                <i class="fa-solid fa-shield-halved nav-brand-icon"></i>
+                <span class="nav-brand-text">FraudTest</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('features') }}" class="nav-link">Features</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                
+                <!-- Auth buttons: shown when user is not logged in -->
+                <div class="auth-buttons auth-action">
+                    <a href="{{ url_for('login') }}" class="nav-link login-btn">Login</a>
+                    <a href="{{ url_for('register') }}" class="nav-link signup-btn">Sign Up</a>
+                </div>
+                
+                <!-- User dropdown: shown when user is logged in -->
+                <div class="user-action" style="display: none;">
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-toggle">
+                            <i class="fa-solid fa-user-circle"></i>
+                            <span class="user-display-name">User</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <div class="user-dropdown-email">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span class="user-email">user@example.com</span>
+                            </div>
+                            <a href="/dashboard" class="user-dropdown-item">
+                                <i class="fa-solid fa-gauge-high"></i>
+                                Dashboard
+                            </a>
+                            <a href="/history" class="user-dropdown-item">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                Analysis History
+                            </a>
+                            <a href="/profile" class="user-dropdown-item">
+                                <i class="fa-solid fa-user"></i>
+                                Profile
+                            </a>
+                            <a href="#" class="logout-button">
+                                <i class="fa-solid fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header" data-aos="fade-up">
+            <h1>Your Analysis History</h1>
+            <p>View all your past URL scan results and track your fraud detection activity over time.</p>
+        </div>
+
+        <div class="history-table-container" data-aos="fade-up" data-aos-delay="100">
+            <!-- Admin Tools (shown only if there are records) -->
+            <div id="adminTools" style="margin-bottom: 1rem; display: none;">
+                <button id="deleteZeroRecords" class="action-btn" style="background-color: var(--danger-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">
+                    <i class="fa-solid fa-trash"></i> Delete 0% Score Records
+                </button>
+                <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1rem;">
+                    Use this button to clean up entries with 0% risk score
+                </span>
+            </div>
+            
+            <!-- Loading spinner -->
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading your scan history...</p>
+            </div>
+            
+            <!-- Empty state (shown when there's no history) -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fa-solid fa-history"></i>
+                <h3>No scan history found</h3>
+                <p>You haven't analyzed any URLs yet. Try scanning a URL to see your history here.</p>
+                <a href="{{ url_for('home') }}"><i class="fa-solid fa-search"></i> Analyze a URL</a>
+            </div>
+            
+            <!-- History table (shown when there's history) -->
+            <table id="historyTable" class="history-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>URL</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- This will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 FraudTest - Advanced Fraud Detection Platform | Final Year Project</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS animations
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Initialize user authentication state
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is signed in
+                    document.querySelector('.auth-action').style.display = 'none';
+                    document.querySelector('.user-action').style.display = 'block';
+                    
+                    // Update user info
+                    document.querySelector('.user-display-name').textContent = user.displayName || 'User';
+                    const userEmail = document.querySelector('.user-email');
+                    if (userEmail) {
+                        userEmail.textContent = user.email || '1211102657@student.mmu.edu.my';
+                    }
+                    
+                    // Load user's scan history
+                    loadScanHistory(user.uid);
+                } else {
+                    // User is not signed in, redirect to login page
+                    window.location.href = '/login';
+                }
+            });
+            
+            // Handle dropdown toggle
+            const userDropdown = document.querySelector('.user-dropdown');
+            const dropdownToggle = document.querySelector('.user-dropdown-toggle');
+            
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', function() {
+                    userDropdown.classList.toggle('active');
+                });
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (userDropdown && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('active');
+                }
+            });
+            
+            // Add logout functionality
+            const logoutButton = document.querySelector('.logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    firebase.auth().signOut().then(() => {
+                        window.location.href = '/';
+                    }).catch((error) => {
+                        console.error('Error signing out:', error);
+                    });
+                });
+            }
+        });
+        
+        // Add handlers for the admin tools
+        const adminTools = document.getElementById('adminTools');
+        const deleteZeroRecords = document.getElementById('deleteZeroRecords');
+        
+        // Function to load user's scan history from Firestore
+        function loadScanHistory(userId) {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const emptyState = document.getElementById('emptyState');
+            const historyTable = document.getElementById('historyTable');
+            const historyTableBody = document.getElementById('historyTableBody');
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            emptyState.style.display = 'none';
+            historyTable.style.display = 'none';
+            adminTools.style.display = 'none';
+            
+            // Get user's scan history from Firestore
+            const db = firebase.firestore();
+            db.collection('users').doc(userId).collection('scans')
+                .orderBy('timestamp', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    if (querySnapshot.empty) {
+                        // Show empty state if no history
+                        emptyState.style.display = 'block';
+                        adminTools.style.display = 'none';
+                    } else {
+                        // Show history table
+                        historyTable.style.display = 'table';
+                        
+                        // Clear table body
+                        historyTableBody.innerHTML = '';
+                        
+                        // Check if there are any zero score records
+                        let hasZeroScores = false;
+                        
+                        // Add each scan to the table
+                        querySnapshot.forEach((doc) => {
+                            const scan = doc.data();
+                            
+                            // Check for zero scores
+                            if (scan.riskScore === 0) {
+                                hasZeroScores = true;
+                            }
+                            
+                            const timestamp = scan.timestamp.toDate();
+                            
+                            // Format date
+                            const date = new Intl.DateTimeFormat('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }).format(timestamp);
+                            
+                            // Create table row
+                            const row = document.createElement('tr');
+                            
+                            // Determine risk level based on score and set appropriate classes and text
+                            let riskLevelClass;
+                            let riskText;
+                            if (scan.riskScore < 30) {
+                                riskLevelClass = 'risk-low';
+                                riskText = 'Low';
+                            } else if (scan.riskScore <= 60) {
+                                riskLevelClass = 'risk-medium';
+                                riskText = 'Medium';
+                            } else {
+                                riskLevelClass = 'risk-high';
+                                riskText = 'High';
+                            }
+                            
+                            // Add row content
+                            row.innerHTML = `
+                                <td>${date}</td>
+                                <td><span title="${scan.url}">${truncateMiddle(scan.url, 40)}</span></td>
+                                <td>
+                                    <div class="risk-score-display ${riskLevelClass}">
+                                        ${scan.riskScore}%
+                                    </div>
+                                </td>
+                                <td><div class="risk-badge ${riskLevelClass}">${riskText}</div></td>
+                                <td>
+                                    <a href="/" class="action-btn" onclick="return analyzeSavedUrl('${encodeURIComponent(scan.url)}')">
+                                        <i class="fa-solid fa-magnifying-glass"></i> Re-scan
+                                    </a>
+                                </td>
+                            `;
+                            
+                            // Add row to table
+                            historyTableBody.appendChild(row);
+                        });
+                        
+                        // Show admin tools if there are zero score records
+                        if (hasZeroScores) {
+                            adminTools.style.display = 'block';
+                        } else {
+                            adminTools.style.display = 'none';
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error getting scan history: ", error);
+                    loadingSpinner.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    adminTools.style.display = 'none';
+                    emptyState.querySelector('h3').textContent = 'Error loading scan history';
+                    emptyState.querySelector('p').textContent = 'An error occurred while loading your scan history. Please try again later.';
+                });
+        }
+        
+        // Helper function to truncate long URLs in the middle
+        function truncateMiddle(str, maxLength) {
+            if (str.length <= maxLength) return str;
+            
+            const startLength = Math.floor(maxLength / 2);
+            const endLength = maxLength - startLength - 3; // 3 for ellipsis
+            
+            return str.substring(0, startLength) + '...' + str.substring(str.length - endLength);
+        }
+        
+        // Function to handle clicking on "Re-scan" button
+        function analyzeSavedUrl(url) {
+            // Set URL in localStorage to be picked up by the home page
+            localStorage.setItem('urlToAnalyze', decodeURIComponent(url));
+            return true; // Continue with navigation
+        }
+        
+        // Function to handle deleting zero score records
+        if (deleteZeroRecords) {
+            deleteZeroRecords.addEventListener('click', function() {
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) return;
+                
+                const userId = currentUser.uid;
+                const db = firebase.firestore();
+                
+                // Show loading spinner
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                loadingSpinner.style.display = 'block';
+                
+                // Query all records with zero risk score
+                db.collection('users').doc(userId).collection('scans')
+                    .where('riskScore', '==', 0)
+                    .get()
+                    .then((querySnapshot) => {
+                        // Create a batch to delete multiple records
+                        const batch = db.batch();
+                        let count = 0;
+                        
+                        querySnapshot.forEach((doc) => {
+                            batch.delete(doc.ref);
+                            count++;
+                        });
+                        
+                        // Commit the batch delete
+                        return batch.commit().then(() => {
+                            console.log(`Deleted ${count} zero score records`);
+                            
+                            // Reload scan history
+                            loadScanHistory(userId);
+                            
+                            // Show success message
+                            alert(`Successfully deleted ${count} records with 0% risk score.`);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting zero score records:", error);
+                        loadingSpinner.style.display = 'none';
+                        alert("Error deleting records: " + error.message);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

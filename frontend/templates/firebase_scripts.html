@@ -1,0 +1,68 @@
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Configuration -->
+<script src="/static/js/firebase-config.js"></script>
+
+<!-- Bridge between Firebase and traditional pages -->
+<script src="/static/js/firebase-bridge.js"></script>
+
+<script>
+  console.log("Firebase scripts loading");
+  
+  // Initialize Firebase on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("Firebase DOM content loaded");
+    
+    // Check if Firebase is properly loaded
+    if (typeof firebase === 'undefined') {
+      console.error("Firebase SDK not loaded properly");
+      return;
+    }
+    
+    // Check if the user is already logged in
+    firebase.auth().onAuthStateChanged(function(user) {
+      console.log("Auth state changed:", user ? "User logged in" : "No user");
+      
+      // Update UI based on auth state
+      const authActions = document.querySelectorAll('.auth-action');
+      const userActions = document.querySelectorAll('.user-action');
+      const userDisplayName = document.querySelectorAll('.user-display-name');
+      const userEmail = document.querySelectorAll('.user-email');
+      
+      if (user) {
+        // User is signed in
+        console.log("Updating UI for logged in user:", user.uid);
+        authActions.forEach(el => el.style.display = 'none');
+        userActions.forEach(el => el.style.display = 'block');
+        userDisplayName.forEach(el => el.textContent = user.displayName || user.email || 'User');
+        userEmail.forEach(el => el.textContent = user.email || '');
+        
+        // Ensure Firestore is initialized with timeout to ensure availability
+        setTimeout(() => {
+          if (window.firestoreDb && typeof firebase.firestore === 'function') {
+            const initialized = window.firestoreDb.init();
+            console.log("Firestore initialization result:", initialized);
+            
+            if (initialized && typeof window.firestoreDb.initializeUserData === 'function') {
+              window.firestoreDb.initializeUserData(user.uid)
+                .then(result => console.log("User data initialized:", result))
+                .catch(err => console.error("Error initializing user data:", err));
+            } else {
+              console.error("Failed to initialize Firestore properly");
+            }
+          } else {
+            console.error("Firestore not available");
+          }
+        }, 1000);
+      } else {
+        // No user is signed in
+        console.log("Updating UI for logged out state");
+        authActions.forEach(el => el.style.display = 'block');
+        userActions.forEach(el => el.style.display = 'none');
+      }
+    });
+  });
+</script> 

@@ -1,0 +1,2608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudTest - Advanced Fraud Detection</title>
+    <!-- Add Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <!-- Add Leaflet JavaScript (after CSS) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+    <!-- Add FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add AOS (Animate on Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/risk-display.css') }}">
+    
+    <!-- Include Firebase scripts -->
+    {% include 'firebase_scripts.html' %}
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #2563eb);
+            --gradient-secondary: linear-gradient(135deg, #10b981, #059669);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #162449, var(--bg-dark));
+            color: var(--text-light);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 25%);
+            z-index: -1;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand-icon {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand:hover .nav-brand-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .nav-brand-text::after {
+            display: none;
+        }
+
+        .nav-brand:hover .nav-brand-text::after {
+            width: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-light);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-info span {
+            color: var(--text-light);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            background-image: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.6)), url('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: pulse-bg 15s infinite alternate;
+            z-index: 0;
+        }
+        
+        @keyframes pulse-bg {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .hero-section > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-right: none;
+            background-color: rgba(51, 65, 85, 0.7);
+            color: var(--text-light);
+            border-radius: 0.5rem 0 0 0.5rem;
+            outline: none;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+        }
+
+        input[type="text"]:focus {
+            background-color: rgba(51, 65, 85, 0.9);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        button {
+            padding: 1.25rem 1.75rem;
+            background: var(--gradient-primary);
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 0 0.5rem 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        /* Loading Spinner */
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--primary-color);
+        }
+
+        .spinner {
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        #results {
+            display: none;
+            margin-top: 2.5rem;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+            z-index: 1;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .url-display {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .url-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .url-value {
+            font-size: 1.125rem;
+            word-break: break-all;
+            color: var(--text-light);
+            padding: 0.5rem 0.75rem;
+            background-color: rgba(15, 23, 42, 0.5);
+            border-radius: 0.375rem;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 1.75rem;
+            border-radius: 0.75rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            transition: all 0.3s ease;
+            min-width: 160px; /* Ensure minimum width */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-display:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .score-display::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transition: background 0.5s ease;
+        }
+
+        .score-display.risk-low::before {
+            background: var(--gradient-secondary);
+        }
+
+        .score-display.risk-medium::before {
+            background: linear-gradient(90deg, var(--warning-color), #f97316);
+        }
+
+        .score-display.risk-high::before {
+            background: var(--gradient-danger);
+        }
+
+        .score-display.risk-low {
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .score-display.risk-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .score-display.risk-high {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .score-value {
+            font-size: 2.25rem !important; /* Force larger size */
+            font-weight: 700 !important; /* Force bold */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 0 auto;
+            line-height: 1.2;
+            letter-spacing: -0.5px; /* Tighter letter spacing */
+        }
+
+        .risk-tag {
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .risk-low .risk-tag {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .risk-medium .risk-tag {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .risk-high .risk-tag {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Risk Meter */
+        .meter-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            height: 1.5rem;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            position: relative;
+            width: 100%;
+        }
+
+        /* Add meter markers */
+        .meter-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Removing the linear-gradient lines that were creating separators */
+            background-image: none; /* Removed separator lines */
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+            min-width: 5px; /* Ensure always visible */
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .meter-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 5s infinite;
+        }
+
+        .meter-fill.low {
+            background: var(--gradient-secondary);
+        }
+
+        .meter-fill.medium {
+            background: linear-gradient(90deg, var(--warning-color), #f97316);
+        }
+
+        .meter-fill.high {
+            background: var(--gradient-danger);
+        }
+
+        .risk-low {
+            color: var(--success-color);
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .risk-medium {
+            color: var(--warning-color);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
+
+        .risk-high {
+            color: var(--danger-color);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .result-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Risk Meter */
+        .meter-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            height: 1.5rem;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            position: relative;
+            width: 100%;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+            min-width: 5px; /* Ensure always visible */
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .meter-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 5s infinite;
+        }
+
+        .meter-fill.low {
+            background: var(--gradient-secondary);
+        }
+
+        .meter-fill.medium {
+            background: linear-gradient(90deg, var(--warning-color), #f97316);
+        }
+
+        .meter-fill.high {
+            background: var(--gradient-danger);
+        }
+
+        .meter-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .meter-labels span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Results Content */
+        .results-content {
+            margin-top: 2rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .results-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .results-section {
+            background-color: rgba(15, 23, 42, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            backdrop-filter: blur(8px);
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .results-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .section-icon {
+            margin-right: 0.75rem;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            color: var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        /* Contribution Bars */
+        .contribution-bar {
+            margin-bottom: 1rem;
+        }
+
+        .contribution-label {
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .contribution-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .bar-container {
+            height: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 1rem;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bar-fill.increase {
+            background: linear-gradient(90deg, var(--danger-color), #dc2626);
+        }
+
+        .bar-fill.decrease {
+            background: linear-gradient(90deg, var(--success-color), #059669);
+        }
+
+        /* Domain Info */
+        .info-list, .patterns-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-item, .pattern-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .info-item:hover, .pattern-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .info-icon, .pattern-icon {
+            width: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        .pattern-icon {
+            color: var(--danger-color);
+        }
+        
+        /* Pattern severity styles */
+        .pattern-icon.high-severity {
+            color: var(--danger-color);
+        }
+        
+        .pattern-icon.medium-severity {
+            color: var(--warning-color);
+        }
+        
+        .pattern-content {
+            flex: 1;
+        }
+        
+        .pattern-title {
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+        
+        .pattern-explanation {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            margin-right: 0.5rem;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .info-value, .pattern-desc {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Map container */
+        #map {
+            height: 200px;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Features Table */
+        .features-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .features-table th {
+            text-align: left;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .features-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.15);
+            vertical-align: middle;
+        }
+
+        .features-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .feature-impact {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .impact-bar {
+            flex: 1;
+            height: 0.375rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .impact-fill {
+            height: 100%;
+            border-radius: 1rem;
+            transition: width 0.6s ease;
+        }
+
+        .impact-fill.increases {
+            background: linear-gradient(90deg, var(--danger-color), #f87171);
+        }
+
+        .impact-fill.decreases {
+            background: linear-gradient(90deg, var(--success-color), #34d399);
+        }
+
+        .impact-text {
+            font-weight: 600;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .impact-text.increases {
+            color: var(--danger-color);
+        }
+
+        .impact-text.decreases {
+            color: var(--success-color);
+        }
+
+        .feature-https {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-radius: 0.25rem;
+        }
+
+        /* Risk Explanation */
+        .risk-explanation {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.3);
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .risk-explanation:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .explanation-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .explanation-title i {
+            color: var(--primary-color);
+        }
+
+        .explanation-box {
+            line-height: 1.7;
+        }
+
+        .explanation-box h4 {
+            color: var(--primary-color);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-box ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        footer p {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .feature-table {
+                font-size: 0.875rem;
+            }
+
+            .impact-bar {
+                width: 60px;
+            }
+            
+            .contribution-bar {
+                flex-wrap: wrap;
+            }
+            
+            .bar-container {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* HTML Security Analysis Styles */
+        .html-security-score {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .score-meter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background-color: var(--bg-card);
+            transition: color 0.5s ease;
+            --progress: 0%;
+            --color: #3b82f6;
+        }
+
+        .score-circle::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--color) var(--progress), rgba(30, 41, 59, 0.4) var(--progress));
+            mask: radial-gradient(transparent 60%, #000 61%);
+            -webkit-mask: radial-gradient(transparent 60%, #000 61%);
+            transition: background 0.5s ease;
+        }
+
+        .score-circle::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            z-index: -1;
+        }
+
+        .score-circle.low-risk {
+            --color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .score-circle.medium-risk {
+            --color: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .score-circle.high-risk {
+            --color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .security-checks {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .security-check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .check-icon {
+            color: var(--success-color);
+            font-size: 1.25rem;
+        }
+
+        .check-text {
+            font-size: 0.95rem;
+        }
+
+        /* Additional styles for security content sections */
+        .security-content {
+            margin-top: 1.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(71, 85, 105, 0.2);
+        }
+        
+        .security-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Improved pattern item styling */
+        .pattern-item {
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .pattern-item:hover {
+            background-color: rgba(0, 0, 0, 0.25);
+            transform: translateX(2px);
+        }
+        
+        .pattern-item .pattern-icon.high-severity + .pattern-content .pattern-title {
+            color: var(--danger-color);
+        }
+        
+        .pattern-item .pattern-icon.medium-severity + .pattern-content .pattern-title {
+            color: var(--warning-color);
+        }
+        
+        /* Error message styling */
+        .error-message {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 3px solid var(--danger-color);
+        }
+        
+        .error-message i {
+            font-size: 1.25rem;
+        }
+
+        /* Update the info-tooltip and tooltip-content classes to better fit the content */
+        .info-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            cursor: help;
+            position: relative;
+        }
+
+        .info-tooltip:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tooltip-content {
+            position: absolute;
+            bottom: 120%;
+            left: -170px; /* Position more to the left for better visibility */
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 360px; /* Make wider for better readability */
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            border: 1px solid var(--border-color);
+            transform: translateY(10px);
+        }
+
+        /* Fix positioning for small screens */
+        @media (max-width: 768px) {
+            .tooltip-content {
+                left: -100px;
+                width: 280px;
+            }
+        }
+
+        .info-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.1s; /* Add a small delay before showing */
+            transition-duration: 0.4s; /* Longer animation for better UX */
+        }
+
+        /* Improve the table styling */
+        .risk-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.8125rem;
+        }
+
+        .risk-info-table th, .risk-info-table td {
+            padding: 0.35rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+        }
+
+        .risk-info-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            background-color: rgba(15, 23, 42, 0.3);
+        }
+
+        .risk-info-table td:last-child {
+            font-weight: 600;
+            text-align: right;
+            color: var(--primary-color);
+        }
+
+        /* Add a heading for the risk scores section */
+        .risk-info-heading {
+            margin: 1rem 0 0.5rem 0;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Update the risk score ranges formatting */
+        .risk-score-ranges {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            border-top: 1px solid rgba(71, 85, 105, 0.2);
+            padding-top: 0.5rem;
+        }
+
+        .risk-score-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .risk-score-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .risk-low {
+            background-color: var(--success-color);
+        }
+
+        .risk-medium {
+            background-color: var(--warning-color);
+        }
+
+        .risk-high {
+            background-color: var(--danger-color);
+        }
+
+        .risk-score-text {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Add this new style to help with scoring display */
+        .html-security-score {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        
+        /* Make sure the content risk meter is properly sized and positioned */
+        .security-analysis-content .score-meter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1rem auto;
+        }
+        
+        .security-analysis-content .score-circle {
+            width: 150px;
+            height: 150px;
+            font-size: 2.5rem;
+        }
+
+        /* Animation keyframes */
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            20% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Add animation classes */
+        .pulse-animation {
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        /* User profile dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .user-button:hover {
+            background: rgba(30, 41, 59, 0.8);
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            width: 180px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .user-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.1);
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(71, 85, 105, 0.2);
+            color: var(--primary-light);
+        }
+
+        /* Feature Cards - New visual appeal */
+        .feature-card {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(71, 85, 105, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            animation: pulse-glow 3s infinite alternate;
+        }
+        
+        /* Particle background effect */
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(59, 130, 246, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 75% 44%, rgba(16, 185, 129, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 46% 82%, rgba(139, 92, 246, 0.03) 0%, transparent 30%);
+            opacity: 0.3;
+            z-index: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .feature-card:hover::after {
+            opacity: 0.8;
+        }
+        
+        .feature-card.fast-analysis::after {
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(59, 130, 246, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 20%);
+        }
+        
+        .feature-card.detailed-insights::after {
+            background-image: 
+                radial-gradient(circle at 75% 25%, rgba(16, 185, 129, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 20% 65%, rgba(5, 150, 105, 0.1) 0%, transparent 20%);
+        }
+        
+        .feature-card.ai-powered::after {
+            background-image: 
+                radial-gradient(circle at 35% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 80% 65%, rgba(109, 40, 217, 0.1) 0%, transparent 20%);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-7px);
+            background: rgba(30, 41, 59, 0.5);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0.7;
+        }
+        
+        .feature-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .feature-card:hover .feature-icon-wrapper {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: rotate(10deg);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.7));
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-light);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card.fast-analysis::before {
+            background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+        }
+        
+        .feature-card.detailed-insights::before {
+            background: linear-gradient(to bottom, #10b981, #059669);
+        }
+        
+        .feature-card.ai-powered::before {
+            background: linear-gradient(to bottom, #8b5cf6, #6d28d9);
+        }
+        
+        .feature-card.fast-analysis .feature-icon {
+            color: #3b82f6;
+        }
+        
+        .feature-card.detailed-insights .feature-icon {
+            color: #10b981;
+        }
+        
+        .feature-card.ai-powered .feature-icon {
+            color: #8b5cf6;
+        }
+        
+        /* Additional animations for feature cards */
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            }
+            50% {
+                box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2);
+            }
+            100% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            }
+        }
+        
+        .feature-card {
+            animation: pulse-glow 3s infinite alternate;
+        }
+        
+        .feature-card.fast-analysis {
+            animation-delay: 0s;
+        }
+        
+        .feature-card.detailed-insights {
+            animation-delay: 1s;
+        }
+        
+        .feature-card.ai-powered {
+            animation-delay: 2s;
+        }
+        
+        /* Feature icon pulse animation */
+        @keyframes icon-pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .feature-icon {
+            animation: icon-pulse 3s infinite;
+        }
+        
+        .feature-card.fast-analysis .feature-icon {
+            animation-delay: 0.5s;
+        }
+        
+        .feature-card.detailed-insights .feature-icon {
+            animation-delay: 1.5s;
+        }
+        
+        .feature-card.ai-powered .feature-icon {
+            animation-delay: 2.5s;
+        }
+
+        /* Download Report Section Styles */
+        .download-report-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.3);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .download-report-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+        
+        .download-report-section h3 {
+            margin-top: 0;
+            color: var(--text-light);
+            font-size: 1.25rem;
+        }
+        
+        .download-report-section p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .download-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .download-button i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+        
+        .download-button.pdf {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .download-button.pdf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s;
+        }
+        
+        .download-button.pdf:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .download-button.pdf:hover::before {
+            left: 100%;
+        }
+        
+        .download-button.pdf.loading {
+            cursor: wait;
+            opacity: 0.8;
+        }
+        
+        .download-button.pdf i {
+            margin-right: 0.75rem;
+        }
+        
+        .download-button.pdf .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Add a new section for charts after the risk score section */
+        .chart-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.3);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .chart-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            background-color: rgba(15, 23, 42, 0.4);
+        }
+
+        .chart-section h3 {
+            margin-top: 0;
+            color: var(--text-light);
+            font-size: 1.25rem;
+        }
+
+        .chart-section p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .chart-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-button i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .chart-button.pdf {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .chart-button.pdf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s;
+        }
+
+        .chart-button.pdf:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .chart-button.pdf:hover::before {
+            left: 100%;
+        }
+
+        .chart-button.pdf.loading {
+            cursor: wait;
+            opacity: 0.8;
+        }
+
+        .chart-button.pdf i {
+            margin-right: 0.75rem;
+        }
+
+        .chart-button.pdf .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Feature chart styling */
+        .feature-impact-card {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background-color: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-impact-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-impact-card .card-header {
+            background-color: rgba(30, 41, 59, 0.7);
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+        }
+        
+        .feature-impact-card .card-body {
+            padding: 1rem;
+        }
+        
+        /* Impact indicator styling */
+        .impact-indicator {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+        
+        .impact-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .impact-bar.positive {
+            background-color: var(--success-color);
+        }
+        
+        .impact-bar.negative {
+            background-color: var(--danger-color);
+        }
+        
+        .impact-value {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .impact-value.positive {
+            color: var(--success-color);
+        }
+        
+        .impact-value.negative {
+            color: var(--danger-color);
+        }
+        
+        /* Risk gauge styling */
+        .risk-gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        
+        .risk-gauge-chart {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .risk-gauge-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .risk-gauge-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        .risk-gauge-text {
+            font-size: 1rem;
+            margin: 5px 0 0;
+            font-weight: 600;
+        }
+        
+        .risk-gauge-low {
+            color: var(--success-color);
+        }
+        
+        .risk-gauge-medium {
+            color: var(--warning-color);
+        }
+        
+        .risk-gauge-high {
+            color: var(--danger-color);
+        }
+
+        /* Styles for API Status Indicator */
+        #apiStatusIndicator {
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: rgba(15, 23, 42, 0.3);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        #apiStatusIndicator[data-status="primary"] span:first-child {
+            background-color: #10b981;
+        }
+        
+        #apiStatusIndicator[data-status="failover"] span:first-child {
+            background-color: #f59e0b;
+        }
+        
+        #apiStatusIndicator[data-status="down"] span:first-child {
+            background-color: #ef4444;
+        }
+        
+        #apiStatusIndicator[data-status="failover"] span:last-child::after {
+            content: ' (Backup)';
+        }
+        
+        #apiStatusIndicator[data-status="down"] span:last-child::after {
+            content: ' (Offline)';
+        }
+
+        /* Feature Details Table Styles */
+        .feature-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(15, 23, 42, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .feature-details-table thead th {
+            background-color: rgba(15, 23, 42, 0.5);
+            color: var(--text-light);
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid rgba(71, 85, 105, 0.2);
+        }
+        
+        .feature-details-table tbody td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.1);
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+        
+        .feature-details-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .feature-details-table tbody tr:hover {
+            background-color: rgba(30, 41, 59, 0.3);
+        }
+        
+        .feature-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .impact-indicator {
+            width: 100%;
+        }
+        
+        .impact-bar {
+            border-radius: 4px;
+            height: 8px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .impact-bar.success {
+            background-color: #10b981;
+        }
+        
+        .impact-bar.warning {
+            background-color: #f59e0b;
+        }
+        
+        .impact-bar.danger {
+            background-color: #ef4444;
+        }
+        
+        .feature-description {
+            margin-top: 20px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: rgba(15, 23, 42, 0.3);
+            font-size: 0.95rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Section Risk Meter Styles */
+        .section-risk-meter {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .section-risk-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .section-risk-label span {
+            font-weight: 600;
+        }
+
+        .section-meter-container {
+            width: 100%;
+            height: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-meter-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+            min-width: 5px; /* Ensure always visible */
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        .section-meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 5s infinite;
+        }
+
+        .section-meter-fill.low {
+            background: var(--gradient-secondary);
+        }
+
+        .section-meter-fill.medium {
+            background: linear-gradient(90deg, var(--warning-color), #f97316);
+        }
+
+        .section-meter-fill.high {
+            background: var(--gradient-danger);
+        }
+
+        .section-risk-percentage {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Add ticks to meter */
+        .section-meter-ticks {
+            display: none; /* Hide ticks to create smooth bars */
+            justify-content: space-between;
+            margin-top: 2px;
+        }
+
+        .section-meter-tick {
+            width: 1px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Add CSS styles for the user dropdown */
+        /* ... existing code ... */
+        
+        /* User dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown-toggle:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 240px;
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown.active .user-dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.25rem;
+            transition: all 0.3s;
+        }
+        
+        .user-email {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+        
+        .user-dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        .auth-action {
+            display: block;
+        }
+
+        .user-action {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-brand" style="text-decoration: none;">
+                <i class="fa-solid fa-shield-halved nav-brand-icon"></i>
+                <span class="nav-brand-text">FraudTest</span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link active">Home</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/features" class="nav-link">Features</a>
+                
+                <!-- Auth buttons: shown when user is not logged in -->
+                <div class="auth-action" id="authLinks">
+                    <a href="/login" class="nav-link">Login</a>
+                </div>
+                
+                <!-- User dropdown: shown when user is logged in -->
+                <div class="user-dropdown user-action" id="userProfile" style="display: none;">
+                    <div class="user-dropdown-toggle">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span class="user-display-name">User</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="user-dropdown-menu">
+                        <div class="user-dropdown-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span class="user-email"></span>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="{{ url_for('dashboard') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('history') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-history"></i>
+                            <span>Analysis History</span>
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-user-edit"></i>
+                            <span>Profile</span>
+                        </a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item logout-button">
+                            <i class="fa-solid fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-section" data-aos="fade-up">
+            <h1>Advanced URL Fraud Detection</h1>
+            <p>Check if a URL is safe before you visit it. Our advanced fraud detection technology helps you identify potentially malicious websites in seconds.</p>
+            <form id="urlForm" class="input-group">
+                <input type="text" id="url" name="url" placeholder="Enter a URL to check (e.g., https://example.com)" required>
+                <button type="submit" id="submitBtn"><i class="fas fa-shield-alt"></i> Analyze</button>
+            </form>
+        </div>
+
+        <!-- Error Message Container -->
+        <div id="errorContainer" style="display: none; background-color: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger-color); padding: 1rem; margin: 1rem 0; border-radius: 0.5rem;" data-aos="fade-up">
+            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                <div style="color: var(--danger-color); font-size: 1.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h3 style="color: var(--danger-color); margin-bottom: 0.5rem;">Error</h3>
+                    <p id="errorMessage" style="margin-bottom: 0.5rem;">An error occurred.</p>
+                    <p id="errorDetails" style="font-size: 0.875rem; color: var(--text-muted);">Please try again or check your connection.</p>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button id="dismissError" style="background: var(--bg-light); color: var(--text-light); padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem;">Dismiss</button>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing URL... This may take a few seconds.</p>
+        </div>
+
+        <!-- Introduction Section -->
+        <div class="result-card" data-aos="fade-up" data-aos-delay="100">
+            <h2>Welcome to FraudTest</h2>
+            <p>FraudTest is an advanced fraud detection platform designed to protect you from online threats. Our machine learning-powered system analyzes URLs in real-time to identify potential phishing attempts, malware, and other security risks.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                <div data-aos="fade-up" data-aos-delay="150" class="feature-card fast-analysis">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-bolt feature-icon"></i>
+                    </div>
+                    <h3>Fast Analysis</h3>
+                    <p>Get instant results about any URL's safety with our lightning-fast scanning technology.</p>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="200" class="feature-card detailed-insights">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-chart-line feature-icon"></i>
+                    </div>
+                    <h3>Detailed Insights</h3>
+                    <p>Receive comprehensive information about why a URL might be risky, including suspicious patterns and domain details.</p>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="250" class="feature-card ai-powered">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-brain feature-icon"></i>
+                    </div>
+                    <h3>AI-Powered</h3>
+                    <p>Our machine learning algorithms continually learn and adapt to new threats for improved detection accuracy.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; text-align: center;" data-aos="fade-up" data-aos-delay="300">
+                <a href="/features" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--gradient-primary); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 500; transition: all 0.3s ease;">Learn More About Our Features</a>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" style="display: none;">
+            <div class="result-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="result-header">
+                    <div class="url-display">
+                        <span class="url-label">Analyzed URL</span>
+                        <div class="url-value" id="resultUrl"></div>
+                    </div>
+                    <div id="scoreDisplayContainer" class="score-display">
+                        <span class="score-label">Fraud Risk Score</span>
+                        <span class="score-value" id="riskScore" style="visibility: visible; display: inline-block;">0%</span>
+                        <div class="risk-tag" id="riskTag">Calculating...</div>
+                    </div>
+                </div>
+
+                <div class="meter-container">
+                    <div class="meter-fill" id="scoreMeter" style="width: 0%;"></div>
+                    <div class="meter-label" id="meterLabel">0%</div>
+                </div>
+
+                <div class="risk-explanation" id="riskExplanation" data-aos="fade-up" data-aos-delay="200">
+                    <div class="explanation-box">
+                        <h3>How We Calculate Risk</h3>
+                        <p>The fraud risk score is based on a comprehensive analysis that considers:</p>
+                        <ul>
+                            <li><strong>URL features (40%):</strong> Analysis of domain, path, parameters, and other URL components</li>
+                            <li><strong>Suspicious patterns (50%):</strong> Identification of known phishing or scam patterns</li>
+                            <li><strong>Domain information (10%):</strong> Background information about the domain and its hosting</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="results-content">
+                    <div class="results-grid">
+                        <!-- Top Risk Factors -->
+                        <div class="results-section" data-aos="fade-up" data-aos-delay="300">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+                                <div class="section-title">Key Risk Factors (AI Predict)</div>
+                            </div>
+                            <div id="topFeatures">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                            <!-- Section Risk Meter -->
+                            <div class="section-risk-meter">
+                                <div class="section-risk-label">Section Risk: <span id="keyRiskFactorsScore">0%</span></div>
+                                <div class="section-meter-container">
+                                    <div class="section-meter-fill" id="keyRiskFactorsMeter" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Domain Information -->
+                        <div class="results-section" data-aos="fade-up" data-aos-delay="400">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fa-solid fa-globe"></i>
+                                </div>
+                                <div class="section-title">Domain Information</div>
+                            </div>
+                            <ul class="info-list" id="domainInfo">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                            <!-- Section Risk Meter -->
+                            <div class="section-risk-meter">
+                                <div class="section-risk-label">Section Risk: <span id="domainInfoScore">0%</span></div>
+                                <div class="section-meter-container">
+                                    <div class="section-meter-fill" id="domainInfoMeter" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Suspicious Patterns -->
+                        <div class="results-section" data-aos="fade-up" data-aos-delay="500">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </div>
+                                <div class="section-title">Suspicious Patterns</div>
+                            </div>
+                            <ul class="patterns-list" id="suspiciousPatterns">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                            <!-- Section Risk Meter -->
+                            <div class="section-risk-meter">
+                                <div class="section-risk-label">Section Risk: <span id="suspiciousPatternsScore">0%</span></div>
+                                <div class="section-meter-container">
+                                    <div class="section-meter-fill" id="suspiciousPatternsMeter" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+            </div>
+
+                    <!-- Feature Details -->
+                    <div class="result-card" data-aos="fade-up" data-aos-delay="700">
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <div class="section-title">Feature Details</div>
+                        </div>
+                        <div class="section-content">
+                            <table class="features-table">
+                                <tbody id="featureDetails">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Security Analysis section removed as requested -->
+            </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 FraudTest - Advanced Fraud Detection Platform | Final Year Project</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add JavaScript for display-results -->
+    <script src="{{ url_for('static', filename='js/display-results.js') }}"></script>
+    <!-- Add JavaScript for feature details -->
+    <script src="{{ url_for('static', filename='js/feature-details.js') }}"></script>
+    <!-- Add API Service -->
+    <script src="{{ url_for('static', filename='js/api-service.js') }}"></script>
+    <!-- Add JavaScript for URL form handling -->
+    <script src="{{ url_for('static', filename='js/url-form-handler.js') }}"></script>
+
+    <script>
+        // ... existing code ...
+        
+        // Initialize AOS animations
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Handle logout button
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (firebase && firebase.auth) {
+                        firebase.auth().signOut().then(function() {
+                            // Sign-out successful
+                            window.location.href = '/';
+                        }).catch(function(error) {
+                            console.error('Error signing out:', error);
+                        });
+                    }
+                });
+            }
+        });
+
+        // Initialize AOS animations
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // Handle user dropdown 
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (userDropdown) {
+                const toggle = userDropdown.querySelector('.user-dropdown-toggle');
+                toggle.addEventListener('click', function() {
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Check if user is logged in
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    const authAction = document.querySelector('.auth-action');
+                    const userAction = document.querySelector('.user-action');
+                    
+                    if (user) {
+                        // User is signed in
+                        if (authAction) authAction.style.display = 'none';
+                        if (userAction) userAction.style.display = 'block';
+                        
+                        // Update user info in dropdown
+                        const userDisplayName = document.querySelector('.user-display-name');
+                        const userEmail = document.querySelector('.user-email');
+                        
+                        if (userDisplayName) {
+                            userDisplayName.textContent = user.displayName || 'User';
+                        }
+                        
+                        if (userEmail) {
+                            userEmail.textContent = user.email;
+                        }
+                        
+                        // Handle logout
+                        const logoutButton = document.querySelector('.logout-button');
+                        if (logoutButton) {
+                            logoutButton.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                firebase.auth().signOut().then(function() {
+                                    window.location.href = "/";
+                                }).catch(function(error) {
+                                    console.error("Error signing out:", error);
+                                });
+                            });
+                        }
+                    } else {
+                        // No user is signed in
+                        if (authAction) authAction.style.display = 'block';
+                        if (userAction) userAction.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudTest - About Us</title>
+    <!-- Add FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add AOS (Animate on Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Include Firebase scripts -->
+    {% include 'firebase_scripts.html' %}
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #334155;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #2563eb);
+            --gradient-secondary: linear-gradient(135deg, #10b981, #059669);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        /* Performance optimizations */
+        .approach-card, .team-member, .content-card, .section-header {
+            will-change: transform, opacity;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            [data-aos] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
+        
+        /* Force hardware acceleration for smoother animations */
+        [data-aos] {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #162449, var(--bg-dark));
+            color: var(--text-light);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08) 0%, transparent 25%);
+            z-index: -1;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-brand-icon {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand:hover .nav-brand-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-light);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .nav-brand-text::after {
+            display: none;
+        }
+
+        .nav-brand:hover .nav-brand-text::after {
+            width: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-light);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            background-image: linear-gradient(to right, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.6)), url('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+            animation: pulse-bg 15s infinite alternate;
+            z-index: 0;
+        }
+        
+        @keyframes pulse-bg {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .page-header > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Content Card */
+        .content-card {
+            background-color: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+            z-index: 1;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .team-grid {
+                justify-content: center;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .team-grid {
+                justify-content: center;
+            }
+        }
+
+        .team-member {
+            background: linear-gradient(145deg, #1e293b, #1a2436);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+            z-index: 1;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        .team-img-container {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .team-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .team-member:hover .team-img {
+            transform: scale(1.05);
+        }
+
+        .team-info {
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .team-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(59, 130, 246, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 75% 44%, rgba(16, 185, 129, 0.05) 0%, transparent 25%);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        .team-name {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .team-role {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .team-role::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .team-bio {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(51, 65, 85, 0.5);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        .social-link:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Risk Explanation */
+        .risk-explanation {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.3);
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .risk-explanation:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .explanation-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .explanation-title i {
+            color: var(--primary-color);
+        }
+
+        .explanation-box {
+            line-height: 1.7;
+        }
+
+        .explanation-box h4 {
+            color: var(--primary-color);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-box ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 1rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: 2px solid var(--bg-dark);
+            z-index: 1;
+        }
+
+        .timeline-date {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content {
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            margin-top: 3rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(71, 85, 105, 0.3);
+        }
+
+        footer p {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Auth and User styles */
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .auth-button {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .auth-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .login-button {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .signup-button {
+            background-color: var(--primary-color);
+        }
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown-toggle:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 240px;
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateY(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown.active .user-dropdown-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.25rem;
+            transition: all 0.3s;
+        }
+        
+        .user-email {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+        
+        .user-dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 0.5rem 0;
+        }
+        
+        .auth-action {
+            display: block;
+        }
+
+        .user-action {
+            display: none;
+        }
+
+        .feature-icon i {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav id="mainNav">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-brand">
+                <i class="fa-solid fa-shield-halved nav-brand-icon"></i>
+                <span class="nav-brand-text">FraudTest</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('features') }}" class="nav-link">Features</a>
+                <a href="{{ url_for('about') }}" class="nav-link active">About</a>
+                
+                <!-- Auth buttons: shown when user is not logged in -->
+                <div class="auth-buttons auth-action">
+                    <a href="{{ url_for('login') }}" class="auth-button login-button">
+                        <i data-feather="log-in" class="h-4 w-4"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="{{ url_for('register') }}" class="auth-button signup-button">
+                        <i data-feather="user-plus" class="h-4 w-4"></i>
+                        <span>Sign Up</span>
+                    </a>
+                </div>
+                
+                <!-- User dropdown: shown when user is logged in -->
+                <div class="user-dropdown user-action">
+                    <div class="user-dropdown-toggle">
+                        <i class="fa-solid fa-user-circle"></i>
+                        <span class="user-display-name">User</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="user-dropdown-menu">
+                        <div class="user-dropdown-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span class="user-email"></span>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="{{ url_for('dashboard') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('history') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-history"></i>
+                            <span>Analysis History</span>
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="user-dropdown-item">
+                            <i class="fa-solid fa-user-edit"></i>
+                            <span>Profile</span>
+                        </a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item logout-button">
+                            <i class="fa-solid fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header" data-aos="fade-up">
+            <h1>About FraudTest</h1>
+            <p>Learn about our mission, our team, and the advanced technology behind our fraud detection platform.</p>
+        </div>
+
+        <div class="content-card" data-aos="fade-up" data-aos-delay="100">
+            <h2>Our Mission</h2>
+            <p>At FraudTest, we are dedicated to making the internet a safer place. Our mission is to provide cutting-edge fraud detection solutions that protect users and businesses from online threats, phishing attempts, and malicious websites.</p>
+            <p>We believe that access to reliable security tools shouldn't be complicated or expensive. That's why we've developed an easy-to-use platform powered by advanced artificial intelligence to give everyone the ability to verify the safety of URLs before visiting them.</p>
+            
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="150">
+                    <div class="timeline-date">2024</div>
+                    <h3 class="timeline-title">Research & Concept</h3>
+                    <p class="timeline-content">Extensive research on URL fraud detection techniques and development of the initial concept for a comprehensive fraud detection platform.</p>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="timeline-date">2025</div>
+                    <h3 class="timeline-title">AI Model Development</h3>
+                    <p class="timeline-content">Created advanced machine learning models capable of accurately identifying fraudulent URLs with high precision and recall rates.</p>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="250">
+                    <div class="timeline-date">2025</div>
+                    <h3 class="timeline-title">Platform Launch</h3>
+                    <p class="timeline-content">Official launch of the FraudTest platform with comprehensive threat analysis, domain verification, and user-friendly interface for instant URL risk assessment.</p>
+                </div>
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="timeline-date">2025</div>
+                    <h3 class="timeline-title">Enhanced Security Analysis</h3>
+                    <p class="timeline-content">Implementation of comprehensive content security analysis system with VirusTotal-like scoring and detailed risk assessment.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Calculation Section -->
+        <div class="content-card" data-aos="fade-up" data-aos-delay="300">
+            <h2>How We Calculate Risk</h2>
+            
+            <div class="risk-explanation" data-aos="fade-up" data-aos-delay="350">
+                <div class="explanation-title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Risk Calculation Methodology</span>
+                </div>
+                <div class="explanation-box">
+                    <p>Our fraud detection system calculates risk based on three main components:</p>
+                    <ul>
+                        <li><strong>URL Features (40%):</strong> Analysis of URL characteristics like length, special characters, and domain properties.</li>
+                        <li><strong>Suspicious Patterns (50%):</strong> Detection of common phishing and fraud patterns.</li>
+                        <li><strong>Domain Information (10%):</strong> Analysis of domain age, popularity, and hosting details.</li>
+                    </ul>
+                    
+                    <!-- New Risk Level Visualizer -->
+                    <div class="risk-level-visualizer" style="margin-top: 2rem; background: rgba(15, 23, 42, 0.3); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);">
+                        <h4 style="text-align: center; margin-bottom: 1.5rem; color: #f8fafc; font-size: 1.2rem;">Understanding Risk Scores</h4>
+                        
+                        <!-- Risk Level Meter -->
+                        <div style="position: relative; height: 80px; margin-bottom: 2rem;">
+                            <!-- Background track -->
+                            <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 8px; transform: translateY(-50%); background: rgba(30, 41, 59, 0.6); border-radius: 4px; overflow: hidden;">
+                                <!-- Low Risk Section -->
+                                <div style="position: absolute; left: 0; top: 0; width: 30%; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 4px 0 0 4px;"></div>
+                                <!-- Medium Risk Section -->
+                                <div style="position: absolute; left: 30%; top: 0; width: 30%; height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                                <!-- High Risk Section -->
+                                <div style="position: absolute; left: 60%; top: 0; width: 40%; height: 100%; background: linear-gradient(90deg, #ef4444, #b91c1c); border-radius: 0 4px 4px 0;"></div>
+                            </div>
+                            
+                            <!-- Markers -->
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                <!-- 0% Marker -->
+                                <div style="position: absolute; bottom: 0; left: 0; transform: translateX(-50%);">
+                                    <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                                    <div style="text-align: center; color: #94a3b8; font-size: 0.875rem; margin-top: 5px;">0%</div>
+                                </div>
+                                
+                                <!-- 30% Marker -->
+                                <div style="position: absolute; bottom: 0; left: 30%; transform: translateX(-50%);">
+                                    <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                                    <div style="text-align: center; color: #94a3b8; font-size: 0.875rem; margin-top: 5px;">30%</div>
+                                </div>
+                                
+                                <!-- 60% Marker -->
+                                <div style="position: absolute; bottom: 0; left: 60%; transform: translateX(-50%);">
+                                    <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                                    <div style="text-align: center; color: #94a3b8; font-size: 0.875rem; margin-top: 5px;">60%</div>
+                                </div>
+                                
+                                <!-- 100% Marker -->
+                                <div style="position: absolute; bottom: 0; right: 0; transform: translateX(50%);">
+                                    <div style="width: 2px; height: 12px; background: #94a3b8; margin: 0 auto;"></div>
+                                    <div style="text-align: center; color: #94a3b8; font-size: 0.875rem; margin-top: 5px;">100%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Level Cards -->
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+                            <!-- Low Risk Card -->
+                            <div style="flex: 1; min-width: 200px; background: rgba(16, 185, 129, 0.1); border-radius: 0.75rem; padding: 1rem; border-left: 4px solid #10b981; display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-shield-check" style="color: #10b981; font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: #10b981; margin-bottom: 0.25rem; font-size: 1.1rem;">Low Risk (0-30%)</h5>
+                                    <p style="font-size: 0.9rem; margin: 0; color: #e2e8f0;">Likely safe to use. Few or no suspicious elements detected.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Medium Risk Card -->
+                            <div style="flex: 1; min-width: 200px; background: rgba(245, 158, 11, 0.1); border-radius: 0.75rem; padding: 1rem; border-left: 4px solid #f59e0b; display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: #f59e0b; margin-bottom: 0.25rem; font-size: 1.1rem;">Medium Risk (30-60%)</h5>
+                                    <p style="font-size: 0.9rem; margin: 0; color: #e2e8f0;">Use with caution. Several suspicious elements detected.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- High Risk Card -->
+                            <div style="flex: 1; min-width: 200px; background: rgba(239, 68, 68, 0.1); border-radius: 0.75rem; padding: 1rem; border-left: 4px solid #ef4444; display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-ban" style="color: #ef4444; font-size: 1.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: #ef4444; margin-bottom: 0.25rem; font-size: 1.1rem;">High Risk (60-100%)</h5>
+                                    <p style="font-size: 0.9rem; margin: 0; color: #e2e8f0;">Avoid this site! Multiple fraud indicators detected.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4>URL Features We Analyze</h4>
+                    <ul>
+                        <li>Domain length and entropy</li>
+                        <li>Special character frequency</li>
+                        <li>TLD (Top-Level Domain) risk score</li>
+                        <li>Presence of suspicious elements (e.g., @, IP addresses, encoded characters)</li>
+                        <li>URL length and structure</li>
+                        <li>Suspicious domain naming patterns</li>
+                        <li>Protocol security (HTTP vs HTTPS)</li>
+                    </ul>
+                    
+                    <h4>Suspicious Patterns Detection</h4>
+                    <ul>
+                        <li>Phishing indicators (e.g., login, password, verify in URLs)</li>
+                        <li>Brand impersonation attempts</li>
+                        <li>Redirect chains and cloaking techniques</li>
+                        <li>Character substitution (e.g., using "0" instead of "o")</li>
+                        <li>Abnormal subdomain structures</li>
+                        <li>Keyword stuffing patterns</li>
+                        <li>Deceptive URL shorteners</li>
+                    </ul>
+                    
+                    <h4>Domain Analysis</h4>
+                    <ul>
+                        <li>Domain age and registration details</li>
+                        <li>Hosting location and provider reputation</li>
+                        <li>SSL certificate validation</li>
+                        <li>Traffic patterns and popularity signals</li>
+                        <li>WHOIS data analysis</li>
+                        <li>IP reputation assessment</li>
+                        <li>Geographic risk analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Approach Section -->
+        <div id="technical-approach" class="content-card" data-aos="fade-up" data-aos-delay="400">
+            <h2>Technical Approach</h2>
+            <p class="section-intro">Our platform combines multiple advanced technologies to deliver accurate and comprehensive fraud detection.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div class="approach-card" data-aos="fade-up" data-aos-delay="450" style="background: rgba(15, 23, 42, 0.3); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); border: 1px solid rgba(71, 85, 105, 0.3); transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, #3b82f6, #2563eb);"></div>
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);">
+                        <i class="fas fa-brain" style="font-size: 2rem; color: #3b82f6;"></i>
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: #f8fafc;">Machine Learning</h3>
+                    <p style="color: #94a3b8; margin-bottom: 1.25rem; line-height: 1.5;">Our core detection engine uses advanced machine learning models trained on millions of URLs to identify fraudulent patterns with high accuracy.</p>
+                    <ul style="padding-left: 1.25rem; color: #e2e8f0; list-style-type: none;">
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #3b82f6; position: absolute; left: 0; top: 0.25rem;"></i> TensorFlow-based neural networks</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #3b82f6; position: absolute; left: 0; top: 0.25rem;"></i> Feature extraction from URL components</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #3b82f6; position: absolute; left: 0; top: 0.25rem;"></i> Continuous model retraining and improvement</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #3b82f6; position: absolute; left: 0; top: 0.25rem;"></i> Ensemble models for reduced false positives</li>
+                    </ul>
+                </div>
+                
+                <div class="approach-card" data-aos="fade-up" data-aos-delay="500" style="background: rgba(15, 23, 42, 0.3); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); border: 1px solid rgba(71, 85, 105, 0.3); transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, #ef4444, #dc2626);"></div>
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);">
+                        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #ef4444;"></i>
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: #f8fafc;">Security Analysis</h3>
+                    <p style="color: #94a3b8; margin-bottom: 1.25rem; line-height: 1.5;">Our comprehensive security analysis examines patterns in URLs, domains, and web content to identify potential threats.</p>
+                    <ul style="padding-left: 1.25rem; color: #e2e8f0; list-style-type: none;">
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #ef4444; position: absolute; left: 0; top: 0.25rem;"></i> URL pattern recognition (40%)</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #ef4444; position: absolute; left: 0; top: 0.25rem;"></i> Suspicious pattern detection (50%)</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #ef4444; position: absolute; left: 0; top: 0.25rem;"></i> Domain age and reputation (10%)</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #ef4444; position: absolute; left: 0; top: 0.25rem;"></i> Custom analysis algorithms</li>
+                    </ul>
+                </div>
+                
+                <div class="approach-card" data-aos="fade-up" data-aos-delay="550" style="background: rgba(15, 23, 42, 0.3); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); border: 1px solid rgba(71, 85, 105, 0.3); transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, #10b981, #059669);"></div>
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);">
+                        <i class="fas fa-database" style="font-size: 2rem; color: #10b981;"></i>
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: #f8fafc;">Real-time Intelligence</h3>
+                    <p style="color: #94a3b8; margin-bottom: 1.25rem; line-height: 1.5;">We leverage real-time data sources to enhance our detection capabilities and provide up-to-date threat intelligence.</p>
+                    <ul style="padding-left: 1.25rem; color: #e2e8f0; list-style-type: none;">
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #10b981; position: absolute; left: 0; top: 0.25rem;"></i> Domain reputation databases</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #10b981; position: absolute; left: 0; top: 0.25rem;"></i> IP geolocation services</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #10b981; position: absolute; left: 0; top: 0.25rem;"></i> SSL certificate validation</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #10b981; position: absolute; left: 0; top: 0.25rem;"></i> WHOIS data analysis</li>
+                        <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: #10b981; position: absolute; left: 0; top: 0.25rem;"></i> Fast API-based analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="content-card" data-aos="fade-up" data-aos-delay="600">
+            <h2 class="section-title-special" style="text-align: center; font-size: 2rem; margin-bottom: 1.5rem; background: linear-gradient(90deg, #fff, #a5b4fc); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block;">Meet Our Team</h2>
+            <div class="section-title-divider" style="height: 3px; width: 80px; background: var(--gradient-primary); margin: 0 auto 2rem; border-radius: 3px;"></div>
+            <p class="section-intro" style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: var(--text-muted); font-size: 1.1rem;">Behind FraudTest is a talented individual combining expertise in machine learning, cybersecurity, and software development to create innovative solutions for online fraud detection.</p>
+            
+            <div class="team-container" data-aos="fade-up" data-aos-delay="650" style="display: flex; justify-content: center; align-items: center;">
+                <div class="team-member" style="max-width: 500px; width: 100%; transform: translateY(0); transition: transform 0.4s ease-out;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div class="team-img-container" style="height: 350px;">
+                        <img src="/static/img/team/khoo_kian_hong.jpg" 
+                             alt="Khoo Kian Hong" 
+                             class="team-img" 
+                             style="object-fit: cover; width: 100%; height: 100%;"
+                             onerror="if(this.src.endsWith('jpg')){this.src='/static/img/team/khoo_kian_hong.png'}else{this.src='/static/img/team/khoo_kian_hong_alt.jpg'};this.onerror=null;">
+                        <div class="team-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent 70%); display: flex; align-items: flex-end; padding: 1.5rem;">
+                            <div class="team-overlay-content">
+                                <div class="pulse-circle" style="width: 15px; height: 15px; background-color: #10b981; border-radius: 50%; display: inline-block; margin-right: 0.5rem; position: relative;">
+                                    <span style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background-color: #10b981; opacity: 0.6; animation: pulse 1.5s infinite; transform-origin: center;"></span>
+                                </div>
+                                <span style="color: white; font-weight: 500;">Security Expert</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-info" style="padding: 2.5rem;">
+                        <h3 class="team-name" style="font-size: 2rem;">Khoo Kian Hong</h3>
+                        <p class="team-role" style="font-size: 1.2rem;">Final Year Student, Security Technology Specialist</p>
+                        <div class="team-divider" style="height: 2px; width: 50px; background: var(--primary-color); margin: 1.25rem 0;"></div>
+                        <p class="team-bio" style="font-size: 1rem; line-height: 1.7;">
+                            As the developer of FraudTest, Kian Hong brings expertise in machine learning and cybersecurity to create innovative solutions for detecting fraudulent websites. With a strong foundation in AI-based security systems and web application development, he designed and implemented this comprehensive fraud detection platform as part of his final year project.
+                        </p>
+                        <div class="social-links" style="margin-top: 2rem;">
+                            <a href="https://www.linkedin.com/in/khoo-kian-hong996" target="_blank" class="social-link" title="LinkedIn Profile" style="width: 3rem; height: 3rem; font-size: 1.2rem; transition: transform 0.3s ease, background-color 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.backgroundColor='#3b82f6';" onmouseout="this.style.transform='translateY(0)'; this.style.backgroundColor='';">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="mailto:kianhong1122@gmail.com" class="social-link" title="Email Me" style="width: 3rem; height: 3rem; font-size: 1.2rem; transition: transform 0.3s ease, background-color 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.backgroundColor='#3b82f6';" onmouseout="this.style.transform='translateY(0)'; this.style.backgroundColor='';">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 FraudTest - Advanced Fraud Detection Platform | Final Year Project</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS (Animate on Scroll) with optimized settings
+            AOS.init({
+                duration: 600,          // Reduced from 800
+                easing: 'ease-out',     // Changed from ease-in-out to ease-out (faster)
+                once: true,             // Elements will only animate once
+                mirror: false,          // No animations when scrolling back up
+                disable: 'mobile',      // Disable on mobile for better performance
+                throttleDelay: 99,      // Increase throttle delay to reduce calculations
+                offset: 120,            // Only trigger animations when element is 120px into viewport
+                delay: 0,               // Remove delays from initialization (individual delays still apply)
+                disableMutationObserver: false
+            });
+            
+            // Handle navbar scroll effect
+            const navbar = document.querySelector('nav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Handle user dropdown 
+            const userDropdown = document.querySelector('.user-dropdown');
+            if (userDropdown) {
+                const toggle = userDropdown.querySelector('.user-dropdown-toggle');
+                toggle.addEventListener('click', function() {
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Reduce animation delays for smoother scrolling
+            document.querySelectorAll('[data-aos-delay]').forEach(element => {
+                // Get current delay and reduce it
+                const currentDelay = parseInt(element.getAttribute('data-aos-delay'));
+                if (currentDelay > 100) {
+                    element.setAttribute('data-aos-delay', Math.min(currentDelay, 100));
+                }
+            });
+            
+            // Check if user is logged in
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().onAuthStateChanged(function(user) {
+                    const authAction = document.querySelector('.auth-action');
+                    const userAction = document.querySelector('.user-action');
+                    
+                    if (user) {
+                        // User is signed in
+                        if (authAction) authAction.style.display = 'none';
+                        if (userAction) userAction.style.display = 'block';
+                        
+                        // Update user info in dropdown
+                        const userDisplayName = document.querySelector('.user-display-name');
+                        const userEmail = document.querySelector('.user-email');
+                        
+                        if (userDisplayName) {
+                            userDisplayName.textContent = user.displayName || 'User';
+                        }
+                        
+                        if (userEmail) {
+                            userEmail.textContent = user.email;
+                        }
+                        
+                        // Handle logout
+                        const logoutButton = document.querySelector('.logout-button');
+                        if (logoutButton) {
+                            logoutButton.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                firebase.auth().signOut().then(function() {
+                                    window.location.href = "/";
+                                }).catch(function(error) {
+                                    console.error("Error signing out:", error);
+                                });
+                            });
+                        }
+                    } else {
+                        // No user is signed in
+                        if (authAction) authAction.style.display = 'block';
+                        if (userAction) userAction.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
