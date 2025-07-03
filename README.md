@@ -2,7 +2,7 @@
 
 A robust, AI-powered web application for detecting fraudulent URLs using advanced machine learning and rule-based analysis. This project combines deep learning, domain intelligence, and real-time web analysis to provide accurate risk assessments for suspicious links.
 
-## 🚀 Features
+## Features
 
 - **Deep Learning Model**: Uses a trained neural network to predict URL fraud risk.
 - **Rule-Based Fallback**: Intelligent heuristics for risk scoring when the model is unavailable.
@@ -12,7 +12,7 @@ A robust, AI-powered web application for detecting fraudulent URLs using advance
 - **API Endpoints**: RESTful endpoints for integration and automation.
 - **Security Best Practices**: HTTPS, input validation, and safe model loading.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python, Flask, TensorFlow, Scikit-learn
 - **Frontend**: Next.js (React), CSS
@@ -20,7 +20,7 @@ A robust, AI-powered web application for detecting fraudulent URLs using advance
 - **Model**: Keras `.h5` model, Scikit-learn scaler
 - **Other**: BeautifulSoup, python-whois, requests
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 frontend/
@@ -37,7 +37,36 @@ frontend/
   package.json          # Node.js dependencies
 ```
 
-## ⚡ Quickstart
+## Prerequisites
+
+Before running the project, ensure you have the following tools installed:
+
+- **Python** (Recommended: 3.8 or higher)  
+  [Download Python](https://www.python.org/downloads/)  
+  Check version:  
+  ```bash
+  python --version
+  ```
+
+- **Node.js** (Recommended: 16.x or higher)  
+  [Download Node.js](https://nodejs.org/en/download/)  
+  This will also install **npm** (Node Package Manager).  
+  Check versions:  
+  ```bash
+  node --version
+  npm --version
+  ```
+
+- **Git** (for cloning the repository)  
+  [Download Git](https://git-scm.com/downloads)  
+  Check version:  
+  ```bash
+  git --version
+  ```
+
+All required Python libraries will be installed via `requirements.txt` and Node.js libraries via `package.json` in the next steps.
+
+## Quickstart
 
 ### 1. Clone the Repo
 
@@ -66,8 +95,8 @@ Create a `.env` file in `frontend/` with:
 
 ```
 FLASK_SECRET_KEY=your-secret-key
-FIREBASE_CREDENTIALS_PATH=key/your-firebase-adminsdk.json
-BACKEND_URL=http://localhost:5000
+FIREBASE_CREDENTIALS_PATH=key/fraudtest-23c54-firebase-adminsdk-fbsvc-6e8c35326e.json
+BACKEND_URL=http://localhost:5001
 MODEL_FILE=models/fraud_model.h5
 ```
 
@@ -77,47 +106,20 @@ MODEL_FILE=models/fraud_model.h5
 python app.py
 ```
 
-### 6. Run the Frontend
-
-```bash
-npm run dev
-```
-
-Visit [http://localhost:3000](http://localhost:3000) for the frontend, [http://localhost:5001](http://localhost:5001) for the backend.
-
----
-
-## 🧠 API Endpoints
+## API Endpoints
 
 - `POST /predict` — Predict fraud risk for a URL (JSON: `{ "url": "..." }`)
 - `POST /analyze` — Full analysis report (JSON or PDF)
 - `GET /health-check` — Service health status
 - `POST /api/analyze-url` — Dashboard quick analyzer
 
-See `app.py` for more.
 
 ---
 
-## 🤖 Model & Security
+## Model & Security
 
 - **Model**: `models/fraud_model.h5` (Keras), `scaler.pkl` (Scikit-learn)
 - **Security**: Uses HTTPS, input validation, and Firebase authentication.
 - **Note**: Do not commit sensitive keys or model files to public repos.
 
 ---
-
-## 📝 License
-
-This project is licensed under the [GPL-3.0 License](LICENSE).
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
-
----
-
-## 📫 Contact
-
-For questions, open an issue or contact [Khoo Kian Hong](mailto:kianh03@gmail.com). 
